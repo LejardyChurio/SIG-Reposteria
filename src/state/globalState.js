@@ -1,10 +1,12 @@
 // src/state/globalState.js
-import { mockInventario, mockMermas, mockPedidos } from '../modules/_mockData.js';
+import { mockInventario, mockRecetas, mockMermas, mockPedidos } from '../modules/_mockData.js';
 export const state = {
   inventario: [...mockInventario],
+  recetas: [...mockRecetas],
   pedidos: [...mockPedidos],
   mermas: [...mockMermas],
   insumosMap: Object.fromEntries(mockInventario.map(i=>[i.id,i])),
+  recetasMap: Object.fromEntries(mockRecetas.map(r=>[r.id,r])),
   online: true,
   syncStatus: 'online',
   COLA_KEY: 'sig_cola_transacciones'
