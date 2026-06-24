@@ -1,7 +1,7 @@
 <!--
 Sistema de Información Gerencial (SIG) para PYME de Repostería Artesanal
 SPA Mobile-First, Offline-First, Integración directa con Supabase
-Desarrollado por GitHub Copilot (GPT-4.1) | 2026 v1
+Desarrollado por GitHub Copilot (GPT-4.1) | 2026
 -->
 <!DOCTYPE html>
 <html lang="es">
@@ -202,12 +202,6 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026 v1
     function renderInventario() {
       const el = document.getElementById('inventario-view');
       // Simulación de movimientos con timestamp para RF-01
-      const movimientos = [
-        { nombre: 'Harina', tipo: 'Entrada', cantidad: 10, fecha: '2026-05-29 09:00' },
-        { nombre: 'Azúcar', tipo: 'Salida', cantidad: 2, fecha: '2026-05-29 10:15' },
-        { nombre: 'Huevos', tipo: 'Entrada', cantidad: 12, fecha: '2026-05-29 11:30' },
-        { nombre: 'Mantequilla', tipo: 'Salida', cantidad: 1, fecha: '2026-05-29 12:00' }
-      ];
       el.innerHTML = `
         <div class="table-card">
           <h3>Inventario de Insumos</h3>
@@ -223,25 +217,35 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026 v1
             `).join('')}
           </tbody></table>
         </div>
-        <div class="table-card">
-          <h3>Movimientos de Inventario <span style='font-weight:normal;font-size:0.95em;'>(Trazabilidad)</span></h3>
-          <table><thead><tr><th>Insumo</th><th>Tipo</th><th>Cantidad</th><th>Timestamp</th></tr></thead><tbody>
-            ${movimientos.map(m => `
-              <tr><td>${m.nombre}</td><td>${m.tipo}</td><td>${m.cantidad}</td><td>${m.fecha}</td></tr>
-            `).join('')}
-          </tbody></table>
-        </div>
         <div class="form-card">
           <h3>Agregar Insumo</h3>
           <form onsubmit="return addInsumo(event)">
             <label>Nombre</label>
             <input type="text" id="insumo-nombre" required>
             <label>Stock Inicial</label>
-            <input type="number" id="insumo-stock" min="0" required>
+            <input type="number" id="insumo-stock" min="0" step="0.01" required>
             <label>Stock Seguridad</label>
-            <input type="number" id="insumo-seguridad" min="0" required>
+            <input type="number" id="insumo-seguridad" min="0" step="0.01" required>
             <label>Unidad de Medida</label>
-            <input type="text" id="insumo-unidad" required>
+            <select id="insumo-unidad" required>
+              <option value="">Seleccione...</option>
+              <optgroup label="Peso">
+                <option value="kg">kg — Kilogramo</option>
+                <option value="g">g — Gramo</option>
+                <option value="lb">lb — Libra</option>
+              </optgroup>
+              <optgroup label="Volumen">
+                <option value="lt">lt — Litro</option>
+                <option value="ml">ml — Mililitro</option>
+              </optgroup>
+              <optgroup label="Unidades">
+                <option value="unid">unid — Unidad</option>
+                <option value="docena">docena — Docena</option>
+                <option value="paquete">paquete — Paquete</option>
+                <option value="caja">caja — Caja</option>
+                <option value="bolsa">bolsa — Bolsa</option>
+              </optgroup>
+            </select>
             <button type="submit">Agregar Insumo</button>
           </form>
         </div>
