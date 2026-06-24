@@ -100,6 +100,7 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
     <button class="nav-btn" data-view="inventario" onclick="switchView('inventario')"><svg viewBox="0 0 24 24"><path d="M3 7.5V6a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 6v1.5M3 7.5h18m-18 0v9A2.25 2.25 0 005.25 18.75h13.5A2.25 2.25 0 0021 16.5v-9m-9 6.75h3.75m-3.75 0V12m0 1.5V12" stroke="#facc15" stroke-width="1.5" fill="none"/></svg> Inventario</button>
     <button class="nav-btn" data-view="mermas" onclick="switchView('mermas')"><svg viewBox="0 0 24 24"><path d="M12 9v3.75m0 3.75h.008v.008H12v-.008zm9.53 2.22a1.5 1.5 0 01-1.28 2.28H3.75a1.5 1.5 0 01-1.28-2.28l8.25-14.25a1.5 1.5 0 012.56 0l8.25 14.25z" stroke="#facc15" stroke-width="1.5" fill="none"/></svg> Mermas</button>
     <button class="nav-btn" data-view="pedidos" onclick="switchView('pedidos')"><svg viewBox="0 0 24 24"><path d="M6.75 3v2.25m10.5-2.25v2.25M3.75 7.5h16.5m-16.5 0A2.25 2.25 0 003 9.75v8.25A2.25 2.25 0 005.25 20.25h13.5A2.25 2.25 0 0021 18V9.75a2.25 2.25 0 00-2.25-2.25m-16.5 0V6A2.25 2.25 0 015.25 3.75h13.5A2.25 2.25 0 0121 6v1.5" stroke="#facc15" stroke-width="1.5" fill="none"/></svg> Pedidos</button>
+    <button class="nav-btn" data-view="recetas" onclick="switchView('recetas')"><svg viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" stroke="#facc15" stroke-width="1.5" fill="none"/></svg> Recetas</button>
   </div>
   <div class="main-content">
     <div id="alertas"></div>
@@ -107,12 +108,14 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
     <div id="inventario-view" class="spa-view"></div>
     <div id="mermas-view" class="spa-view"></div>
     <div id="pedidos-view" class="spa-view"></div>
+    <div id="recetas-view" class="spa-view"></div>
   </div>
   <div class="bottom-nav">
     <button class="nav-btn active" data-view="dashboard" onclick="switchView('dashboard')"><svg viewBox="0 0 24 24"><path d="M2.25 12l8.954-8.955a1.5 1.5 0 012.122 0L22.25 12M4.5 10.5V19.5A2.25 2.25 0 006.75 21.75h2.25m6 0h2.25A2.25 2.25 0 0019.5 19.5V10.5m-15 0L12 3.75m0 0l7.5 6.75" stroke="#facc15" stroke-width="1.5" fill="none"/></svg><span>Dashboard</span></button>
     <button class="nav-btn" data-view="inventario" onclick="switchView('inventario')"><svg viewBox="0 0 24 24"><path d="M3 7.5V6a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 6v1.5M3 7.5h18m-18 0v9A2.25 2.25 0 005.25 18.75h13.5A2.25 2.25 0 0021 16.5v-9m-9 6.75h3.75m-3.75 0V12m0 1.5V12" stroke="#facc15" stroke-width="1.5" fill="none"/></svg><span>Inventario</span></button>
     <button class="nav-btn" data-view="mermas" onclick="switchView('mermas')"><svg viewBox="0 0 24 24"><path d="M12 9v3.75m0 3.75h.008v.008H12v-.008zm9.53 2.22a1.5 1.5 0 01-1.28 2.28H3.75a1.5 1.5 0 01-1.28-2.28l8.25-14.25a1.5 1.5 0 012.56 0l8.25 14.25z" stroke="#facc15" stroke-width="1.5" fill="none"/></svg><span>Mermas</span></button>
     <button class="nav-btn" data-view="pedidos" onclick="switchView('pedidos')"><svg viewBox="0 0 24 24"><path d="M6.75 3v2.25m10.5-2.25v2.25M3.75 7.5h16.5m-16.5 0A2.25 2.25 0 003 9.75v8.25A2.25 2.25 0 005.25 20.25h13.5A2.25 2.25 0 0021 18V9.75a2.25 2.25 0 00-2.25-2.25m-16.5 0V6A2.25 2.25 0 015.25 3.75h13.5A2.25 2.25 0 0121 6v1.5" stroke="#facc15" stroke-width="1.5" fill="none"/></svg><span>Pedidos</span></button>
+    <button class="nav-btn" data-view="recetas" onclick="switchView('recetas')"><svg viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" stroke="#facc15" stroke-width="1.5" fill="none"/></svg><span>Recetas</span></button>
   </div>
   <script>
     // --- Estado y datos mock ---
@@ -130,9 +133,16 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
         ],
         mermas: [],
         pedidos: [],
+        recetas: [
+          { id: 1, nombre: 'Torta Selva Negra', descripcion: 'Torta húmeda con crema y cerezas' },
+          { id: 2, nombre: 'Torta de Chocolate', descripcion: 'Torta húmeda de cacao' },
+          { id: 3, nombre: 'Cupcakes de Vainilla', descripcion: 'Cupcakes esponjosos con buttercream' },
+          { id: 4, nombre: 'Cheesecake', descripcion: 'Cheesecake cremoso con base de galleta' }
+        ],
         nextInsumoId: 5,
         nextMermaId: 1,
-        nextPedidoId: 1
+        nextPedidoId: 1,
+        nextRecetaId: 5
       };
     }
     function loadState() {
@@ -171,6 +181,7 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
       if (view === 'inventario') renderInventario();
       if (view === 'mermas') renderMermas();
       if (view === 'pedidos') renderPedidos();
+      if (view === 'recetas') renderRecetas();
     }
     window.switchView = switchView;
 
@@ -271,14 +282,16 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
 
     function renderPedidos() {
       const el = document.getElementById('pedidos-view');
+      const recetasMap = state.recetas.reduce((acc, r) => { acc[r.id] = r.nombre; return acc; }, {});
+      const recetasOpts = state.recetas.map(r => `<option value="${r.id}">${r.nombre}</option>`).join('');
       el.innerHTML = `
         <div class="table-card">
           <h3>Pedidos</h3>
-          <table><thead><tr><th>Cliente</th><th>Producto</th><th>Cantidad</th><th>Estado</th><th></th></tr></thead><tbody>
+          <table><thead><tr><th>Cliente</th><th>Receta</th><th>Cantidad</th><th>Estado</th><th></th></tr></thead><tbody>
             ${state.pedidos.map(p => `
               <tr>
                 <td>${p.cliente}</td>
-                <td>${p.producto}</td>
+                <td>${recetasMap[p.recetaId] || p.producto || '—'}</td>
                 <td>${p.cantidad}</td>
                 <td>${p.entregado ? 'Entregado' : 'Pendiente'}</td>
                 <td>${!p.entregado ? `<button class='btn-entregado' onclick='completePedido(${p.id})'>Marcar Entregado</button>` : ''}</td>
@@ -291,8 +304,10 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
           <form onsubmit="return addPedido(event)">
             <label>Cliente</label>
             <input type="text" id="pedido-cliente" required>
-            <label>Producto</label>
-            <input type="text" id="pedido-producto" required>
+            <label>Receta</label>
+            <select id="pedido-receta" required>
+              ${recetasOpts}
+            </select>
             <label>Cantidad</label>
             <input type="number" id="pedido-cantidad" min="1" required>
             <button type="submit">Agregar Pedido</button>
@@ -384,16 +399,68 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
     function addPedido(e) {
       e.preventDefault();
       const cliente = document.getElementById('pedido-cliente').value.trim();
-      const producto = document.getElementById('pedido-producto').value.trim();
+      const recetaId = parseInt(document.getElementById('pedido-receta').value, 10);
       const cantidad = parseInt(document.getElementById('pedido-cantidad').value, 10);
-      if (!cliente || !producto || isNaN(cantidad) || cantidad < 1) return false;
-      state.pedidos.push({ id: state.nextPedidoId++, cliente, producto, cantidad, entregado: false });
+      if (!cliente || isNaN(recetaId) || isNaN(cantidad) || cantidad < 1) return false;
+      state.pedidos.push({ id: state.nextPedidoId++, cliente, recetaId, cantidad, entregado: false });
       saveState();
       showToast('Pedido agregado');
       renderPedidos();
       return false;
     }
     window.addPedido = addPedido;
+
+    function renderRecetas() {
+      const el = document.getElementById('recetas-view');
+      el.innerHTML = `
+        <div class="table-card">
+          <h3>Recetas</h3>
+          <table><thead><tr><th>Nombre</th><th>Descripción</th><th></th></tr></thead><tbody>
+            ${state.recetas.map(r => `
+              <tr>
+                <td>${r.nombre}</td>
+                <td>${r.descripcion}</td>
+                <td><button onclick="deleteReceta(${r.id})">Eliminar</button></td>
+              </tr>
+            `).join('')}
+          </tbody></table>
+        </div>
+        <div class="form-card">
+          <h3>Nueva Receta</h3>
+          <form onsubmit="return addReceta(event)">
+            <label>Nombre</label>
+            <input type="text" id="receta-nombre" required>
+            <label>Descripción</label>
+            <input type="text" id="receta-descripcion">
+            <button type="submit">Agregar Receta</button>
+          </form>
+        </div>
+      `;
+    }
+    window.renderRecetas = renderRecetas;
+
+    function addReceta(e) {
+      e.preventDefault();
+      const nombre = document.getElementById('receta-nombre').value.trim();
+      const descripcion = document.getElementById('receta-descripcion').value.trim();
+      if (!nombre) return false;
+      state.recetas.push({ id: state.nextRecetaId++, nombre, descripcion });
+      saveState();
+      showToast('Receta agregada');
+      renderRecetas();
+      return false;
+    }
+    window.addReceta = addReceta;
+
+    function deleteReceta(id) {
+      const enUso = state.pedidos.some(p => p.recetaId === id);
+      if (enUso) { showToast('No se puede eliminar: receta en uso por pedidos'); return; }
+      state.recetas = state.recetas.filter(r => r.id !== id);
+      saveState();
+      showToast('Receta eliminada');
+      renderRecetas();
+    }
+    window.deleteReceta = deleteReceta;
 
     function completePedido(id) {
       const pedido = state.pedidos.find(p => p.id === id);
@@ -410,6 +477,7 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
       renderInventario();
       renderMermas();
       renderPedidos();
+      renderRecetas();
     }
     window.onload = init;
   </script>
