@@ -15,6 +15,7 @@ export async function marcarEntregado(id) {
 }
 
 export async function renderPedidos() {
+  const recetasMap = Object.fromEntries(state.recetas.map(r=>[r.id, r.nombre]));
   const form = `
     <form id="form-pedido" class="bg-white rounded-lg shadow p-4 mb-6 flex flex-col gap-4 max-w-lg mx-auto">
       <div class="text-lg font-bold mb-2 text-slate-900">Registrar pedido</div>
@@ -24,7 +25,10 @@ export async function renderPedidos() {
       </div>
       <div>
         <label class="block text-slate-700 mb-1">Receta</label>
-        <input name="receta_nombre" type="text" class="w-full rounded border p-2" required>
+        <select name="recetaId" class="w-full rounded border p-2" required>
+          <option value="">Seleccione...</option>
+          ${state.recetas.map(r=>`<option value="${r.id}">${r.nombre}</option>`).join('')}
+        </select>
       </div>
       <div>
         <label class="block text-slate-700 mb-1">Cantidad</label>
@@ -37,7 +41,6 @@ export async function renderPedidos() {
       <button type="submit" class="bg-slate-900 text-white rounded py-2 text-lg font-semibold hover:bg-slate-800">Registrar pedido</button>
     </form>
   `;
-  // Listado de pedidos pendientes
   const listado = `
     <div class="bg-white rounded-lg shadow p-4">
       <div class="text-lg font-bold mb-2 text-slate-900">Pedidos pendientes</div>
@@ -57,7 +60,7 @@ export async function renderPedidos() {
             ${state.pedidos.filter(p=>p.estado==='Pendiente').sort((a,b)=>a.fecha_entrega.localeCompare(b.fecha_entrega)).map(p=>`
               <tr>
                 <td class="px-2 py-1">${p.cliente}</td>
-                <td class="px-2 py-1">${p.receta_nombre}</td>
+                <td class="px-2 py-1">${recetasMap[p.recetaId] || p.receta_nombre || '—'}</td>
                 <td class="px-2 py-1">${p.cantidad}</td>
                 <td class="px-2 py-1">${p.fecha_entrega}</td>
                 <td class="px-2 py-1">${p.estado}</td>
@@ -77,13 +80,13 @@ export async function renderPedidos() {
     const fd = new FormData(e.target);
     const datos = {
       cliente: fd.get('cliente'),
-      receta_nombre: fd.get('receta_nombre'),
+      recetaId: parseInt(fd.get('recetaId'), 10),
       cantidad: parseInt(fd.get('cantidad')),
       estado: 'Pendiente',
       fecha_entrega: fd.get('fecha_entrega'),
       timestamp: new Date().toISOString()
     };
-    if (!datos.cliente || !datos.receta_nombre || isNaN(datos.cantidad) || !datos.fecha_entrega) return showToast('Datos inválidos', 'error');
+    if (!datos.cliente || isNaN(datos.recetaId) || isNaN(datos.cantidad) || !datos.fecha_entrega) return showToast('Datos inválidos', 'error');
     try {
       await registrarPedidoSupabase(datos);
       showToast('Pedido registrado', 'success');
@@ -92,7 +95,6 @@ export async function renderPedidos() {
       showToast('Error: ' + err.message, 'error');
     }
   };
-  // Exponer función para botones
   window._marcarEntregado = async function(id) {
     await marcarEntregado(id);
     renderPedidos();
