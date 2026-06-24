@@ -14,70 +14,56 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
   <!-- Favicon neutral, pastel minimalista SVG inline -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cellipse cx='24' cy='38' rx='16' ry='6' fill='%23facc15'/%3E%3Cpath d='M8 38V24c0-8.8 8-14 16-14s16 5.2 16 14v14' fill='%23fff' stroke='%23facc15' stroke-width='2'/%3E%3Cellipse cx='24' cy='24' rx='12' ry='6' fill='%23fde68a' stroke='%23facc15' stroke-width='1.5'/%3E%3C/svg%3E"/>
   <style>
+    *, *::before, *::after { box-sizing: border-box; }
     body { background: #f8fafc; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
     .sidebar, .bottom-nav { background: #1e293b; color: #fff; }
     .sidebar { width: 220px; min-height: 100vh; padding: 24px 12px 0 12px; position: fixed; left: 0; top: 0; display: flex; flex-direction: column; }
     .sidebar .logo { display: flex; align-items: center; margin-bottom: 32px; }
     .sidebar .logo svg {
-      width: 44px;
-      height: 44px;
-      max-width: 50px;
-      max-height: 50px;
-      margin-right: 10px;
-      display: block;
+      width: 44px; height: 44px; max-width: 50px; max-height: 50px; margin-right: 10px; display: block;
     }
     .sidebar .logo span { font-size: 1.3rem; font-weight: bold; letter-spacing: 1px; }
-    .sidebar .nav-btn { background: none; border: none; color: #fff; text-align: left; padding: 12px 8px; margin-bottom: 8px; border-radius: 6px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; transition: background 0.2s; }
+    .sidebar .nav-btn { background: none; border: none; color: #fff; text-align: left; padding: 12px 8px; margin-bottom: 8px; border-radius: 6px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; transition: background 0.2s; width: 100%; }
     .sidebar .nav-btn.active, .sidebar .nav-btn:hover { background: #334155; }
-    .sidebar .nav-btn svg {
-      width: 24px;
-      height: 24px;
-      max-width: 24px;
-      max-height: 24px;
-      margin-right: 8px;
-      vertical-align: middle;
-      object-fit: contain;
-      fill: currentColor;
-      flex-shrink: 0;
-    }
+    .sidebar .nav-btn svg { width: 24px; height: 24px; margin-right: 8px; flex-shrink: 0; fill: currentColor; }
     .main-content { margin-left: 220px; padding: 32px 16px 16px 16px; min-height: 100vh; }
     .spa-view { display: none; }
     .spa-view.active { display: block; }
-    .kpi-cards { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
-    .kpi-card { background: #1e293b; color: #fff; border-radius: 12px; padding: 24px 16px; flex: 1 1 220px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 2px 8px #0001; }
+    .kpi-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .kpi-card { background: #1e293b; color: #fff; border-radius: 12px; padding: 20px 12px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 2px 8px #0001; }
     .kpi-card svg { width: 36px; height: 36px; margin-bottom: 8px; }
     .alerta-critica { animation: parpadeo 1s infinite alternate; background: #dc2626; color: #fff; text-align: center; padding: 10px; border-radius: 8px; font-weight: bold; margin-bottom: 18px; }
     @keyframes parpadeo { from { opacity: 1; } to { opacity: 0.4; } }
-    .form-card, .table-card { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #0001; padding: 20px; margin-bottom: 24px; }
+    .form-card, .table-card { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #0001; padding: 16px; margin-bottom: 24px; width: 100%; }
+    .form-card { max-width: 480px; }
     .form-card label { font-weight: 500; margin-bottom: 4px; display: block; }
-    .form-card input, .form-card select { width: 100%; padding: 8px; margin-bottom: 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 1rem; }
+    .form-card input, .form-card select { width: 100%; padding: 8px 10px; margin-bottom: 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 1rem; }
     .form-card button { background: #1e293b; color: #fff; border: none; border-radius: 6px; padding: 10px 0; font-size: 1.1rem; font-weight: bold; cursor: pointer; width: 100%; margin-top: 8px; }
     .form-card button:hover { background: #334155; }
-    .table-card table { width: 100%; border-collapse: collapse; font-size: 0.98rem; }
-    .table-card th, .table-card td { padding: 8px 6px; text-align: left; }
+    .table-card { overflow-x: auto; }
+    .table-card table { width: 100%; border-collapse: collapse; font-size: 0.92rem; min-width: 400px; }
+    .table-card th, .table-card td { padding: 8px 8px; text-align: left; white-space: nowrap; }
     .table-card th { background: #e2e8f0; }
     .table-card tr.critico { background: #fee2e2; }
     .table-card tr { border-bottom: 1px solid #e5e7eb; }
-    .btn-entregado { background: #16a34a; color: #fff; border: none; border-radius: 5px; padding: 5px 12px; font-size: 0.95rem; cursor: pointer; }
+    .btn-entregado { background: #16a34a; color: #fff; border: none; border-radius: 5px; padding: 5px 10px; font-size: 0.88rem; cursor: pointer; white-space: nowrap; }
     .btn-entregado:hover { background: #166534; }
-    .toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: #facc15; color: #1e293b; padding: 10px 24px; border-radius: 8px; font-weight: bold; z-index: 9999; display: none; }
+    .toast { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); background: #facc15; color: #1e293b; padding: 10px 24px; border-radius: 8px; font-weight: bold; z-index: 9999; display: none; max-width: 90vw; text-align: center; }
+    .bottom-nav { display: none; position: fixed; left: 0; right: 0; bottom: 0; background: #1e293b; color: #fff; height: 60px; align-items: center; justify-content: space-around; z-index: 100; }
+    .bottom-nav .nav-btn { background: none; border: none; color: #fff; font-size: 0.72rem; display: flex; flex-direction: column; align-items: center; padding: 4px 2px; flex: 1; }
+    .bottom-nav .nav-btn.active, .bottom-nav .nav-btn:hover { color: #facc15; }
+    .bottom-nav svg { width: 22px; height: 22px; margin-bottom: 2px; fill: currentColor; display: block; }
     @media (max-width: 900px) {
       .sidebar { display: none; }
-      .main-content { margin-left: 0; padding-top: 70px; }
+      .main-content { margin-left: 0; padding: 16px 10px 80px 10px; }
       .bottom-nav { display: flex; }
+      .form-card { max-width: 100%; }
+      .kpi-cards { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .kpi-card { padding: 14px 8px; font-size: 0.9rem; }
     }
-    .bottom-nav { display: none; position: fixed; left: 0; right: 0; bottom: 0; background: #1e293b; color: #fff; height: 56px; align-items: center; justify-content: space-around; z-index: 100; }
-    .bottom-nav .nav-btn { background: none; border: none; color: #fff; font-size: 0.95rem; display: flex; flex-direction: column; align-items: center; padding: 0; }
-    .bottom-nav .nav-btn.active, .bottom-nav .nav-btn:hover { color: #facc15; }
-    .bottom-nav svg {
-      width: 24px;
-      height: 24px;
-      max-width: 24px;
-      max-height: 24px;
-      margin-bottom: 2px;
-      object-fit: contain;
-      fill: currentColor;
-      display: block;
+    @media (max-width: 480px) {
+      .kpi-cards { grid-template-columns: repeat(2, 1fr); }
+      .table-card th, .table-card td { padding: 6px 6px; font-size: 0.82rem; }
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
