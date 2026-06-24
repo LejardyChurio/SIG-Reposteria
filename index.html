@@ -80,6 +80,7 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
       display: block;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="toast" id="toast"></div>
@@ -118,46 +119,30 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
     <button class="nav-btn" data-view="recetas" onclick="switchView('recetas')"><svg viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" stroke="#facc15" stroke-width="1.5" fill="none"/></svg><span>Recetas</span></button>
   </div>
   <script>
-    // --- Estado y datos mock ---
-    const SUPABASE_URL = 'SUPABASE_URL_AQUI';
-    const SUPABASE_KEY = 'SUPABASE_KEY_AQUI';
-    const DEMO_MODE = SUPABASE_URL === 'SUPABASE_URL_AQUI' || SUPABASE_KEY === 'SUPABASE_KEY_AQUI';
-    const LS_KEY = 'sig-reposteria-demo';
-    function getDefaultState() {
-      return {
-        inventario: [
-          { id: 1, nombre: 'Harina', stock_actual: 10, stock_seguridad: 5, unidad_medida: 'kg' },
-          { id: 2, nombre: 'Azúcar', stock_actual: 8, stock_seguridad: 4, unidad_medida: 'kg' },
-          { id: 3, nombre: 'Huevos', stock_actual: 30, stock_seguridad: 12, unidad_medida: 'unid' },
-          { id: 4, nombre: 'Mantequilla', stock_actual: 5, stock_seguridad: 2, unidad_medida: 'kg' }
-        ],
-        mermas: [],
-        pedidos: [],
-        recetas: [
-          { id: 1, nombre: 'Torta Selva Negra', descripcion: 'Torta húmeda con crema y cerezas' },
-          { id: 2, nombre: 'Torta de Chocolate', descripcion: 'Torta húmeda de cacao' },
-          { id: 3, nombre: 'Cupcakes de Vainilla', descripcion: 'Cupcakes esponjosos con buttercream' },
-          { id: 4, nombre: 'Cheesecake', descripcion: 'Cheesecake cremoso con base de galleta' }
-        ],
-        nextInsumoId: 5,
-        nextMermaId: 1,
-        nextPedidoId: 1,
-        nextRecetaId: 5
-      };
-    }
-    function loadState() {
-      if (DEMO_MODE) {
-        const raw = localStorage.getItem(LS_KEY);
-        if (raw) try { return JSON.parse(raw); } catch { }
-        return getDefaultState();
+    // --- Supabase ---
+    const SUPABASE_URL = 'https://ejcsptynoutfddlhiuze.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqY3NwdHlub3V0ZmRkbGhpdXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMTEyMDksImV4cCI6MjA5Nzg4NzIwOX0.d4LEscd36tsIlkSkl1gkaksLGZAw1U2PNXE4qdioylI';
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // --- Estado ---
+    let state = { inventario: [], mermas: [], pedidos: [], recetas: [] };
+
+    async function loadFromSupabase() {
+      try {
+        const [inv, rec, mer, ped] = await Promise.all([
+          db.from('inventario').select('*').order('id'),
+          db.from('recetas').select('*').order('id'),
+          db.from('mermas').select('*').order('id'),
+          db.from('pedidos').select('*').order('id')
+        ]);
+        if (inv.data) state.inventario = inv.data;
+        if (rec.data) state.recetas = rec.data;
+        if (mer.data) state.mermas = mer.data;
+        if (ped.data) state.pedidos = ped.data;
+      } catch(err) {
+        showToast('Error conectando con Supabase');
       }
-      // Aquí iría la lógica real con Supabase
-      return getDefaultState();
     }
-    function saveState() {
-      if (DEMO_MODE) localStorage.setItem(LS_KEY, JSON.stringify(state));
-    }
-    let state = loadState();
 
     // --- Utilidades UI ---
     function showToast(msg) {
@@ -269,10 +254,10 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
       el.innerHTML = `
         <div class="table-card">
           <h3>Historial de Mermas</h3>
-          <table><thead><tr><th>Insumo</th><th>Cantidad</th><th>Fecha</th></tr></thead><tbody>
-            ${state.mermas.map(m => {
-              const insumo = state.inventario.find(i => i.id === m.insumoId);
-              return `<tr><td>${insumo ? insumo.nombre : 'Desconocido'}</td><td>${m.cantidad}</td><td>${m.fecha}</td></tr>`;
+          <table><thead><tr><th>Insumo</th><th>Cantidad</th><th>Motivo</th><th>Fecha</th></tr></thead><tbody>
+            ${state.mermas.slice().reverse().map(m => {
+              const insumo = state.inventario.find(i => i.id === m.id_insumo);
+              return `<tr><td>${insumo ? insumo.nombre : 'Desconocido'}</td><td>${m.cantidad_merma}</td><td>${m.motivo_merma || '—'}</td><td>${m.timestamp ? new Date(m.timestamp).toLocaleString('es-VE') : '—'}</td></tr>`;
             }).join('')}
           </tbody></table>
         </div>
@@ -291,10 +276,10 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
             ${state.pedidos.map(p => `
               <tr>
                 <td>${p.cliente}</td>
-                <td>${recetasMap[p.recetaId] || p.producto || '—'}</td>
+                <td>${recetasMap[p.receta_id] || '—'}</td>
                 <td>${p.cantidad}</td>
-                <td>${p.entregado ? 'Entregado' : 'Pendiente'}</td>
-                <td>${!p.entregado ? `<button class='btn-entregado' onclick='completePedido(${p.id})'>Marcar Entregado</button>` : ''}</td>
+                <td>${p.estado || 'Pendiente'}</td>
+                <td>${p.estado !== 'Entregado' ? `<button class='btn-entregado' onclick='completePedido(${p.id})'>Marcar Entregado</button>` : ''}</td>
               </tr>
             `).join('')}
           </tbody></table>
@@ -306,6 +291,7 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
             <input type="text" id="pedido-cliente" required>
             <label>Receta</label>
             <select id="pedido-receta" required>
+              <option value="">Seleccione una receta...</option>
               ${recetasOpts}
             </select>
             <label>Cantidad</label>
@@ -318,95 +304,66 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
     window.renderPedidos = renderPedidos;
 
     // --- Acciones ---
-    function addInsumo(e) {
+    async function addInsumo(e) {
       e.preventDefault();
       const nombre = document.getElementById('insumo-nombre').value.trim();
-      const stock = parseInt(document.getElementById('insumo-stock').value, 10);
-      const seguridad = parseInt(document.getElementById('insumo-seguridad').value, 10);
+      const stock = parseFloat(document.getElementById('insumo-stock').value);
+      const seguridad = parseFloat(document.getElementById('insumo-seguridad').value);
       const unidad = document.getElementById('insumo-unidad').value.trim();
-      if (!nombre || isNaN(stock) || isNaN(seguridad) || !unidad) return false;
-
-      // --- REGLA 1: UPSERT LOCAL (NO DUPLICADOS) ---
-      const nombreLower = nombre.toLocaleLowerCase();
-      let insumoExistente = state.inventario.find(i => i.nombre.toLocaleLowerCase() === nombreLower);
-      let objetoInsumo;
-      if (insumoExistente) {
-        // Sumar stock al existente
-        insumoExistente.stock_actual += stock;
-        insumoExistente.stock_seguridad = seguridad; // Permite actualizar el stock de seguridad
-        insumoExistente.unidad_medida = unidad;
-        objetoInsumo = {
-          id: insumoExistente.id,
-          nombre: insumoExistente.nombre,
-          stock_actual: insumoExistente.stock_actual,
-          stock_seguridad: insumoExistente.stock_seguridad,
-          unidad_medida: insumoExistente.unidad_medida
-        };
+      if (!nombre || isNaN(stock) || isNaN(seguridad) || !unidad) return;
+      const existente = state.inventario.find(i => i.nombre.toLowerCase() === nombre.toLowerCase());
+      if (existente) {
+        const nuevo_stock = existente.stock_actual + stock;
+        const { error } = await db.from('inventario').update({ stock_actual: nuevo_stock, stock_seguridad: seguridad, unidad_medida: unidad }).eq('id', existente.id);
+        if (!error) { existente.stock_actual = nuevo_stock; existente.stock_seguridad = seguridad; existente.unidad_medida = unidad; }
+        else { showToast('Error actualizando insumo'); return; }
       } else {
-        // Nuevo insumo
-        objetoInsumo = {
-          id: state.nextInsumoId++,
-          nombre: nombre,
-          stock_actual: stock,
-          stock_seguridad: seguridad,
-          unidad_medida: unidad
-        };
-        state.inventario.push(objetoInsumo);
+        const { data, error } = await db.from('inventario').insert({ nombre, stock_actual: stock, stock_seguridad: seguridad, unidad_medida: unidad }).select().single();
+        if (!error && data) state.inventario.push(data);
+        else { showToast('Error agregando insumo'); return; }
       }
-
-      // --- REGLA 2: ENRUTAMIENTO AL MOTOR HÍBRIDO ---
-      if (window.guardarTransaccion) {
-        window.guardarTransaccion('insumos', objetoInsumo);
-      }
-
-      saveState();
       showToast('Insumo actualizado');
       renderInventario();
-
-      // --- REGLA 3: REFRESCO DE ALERTAS ---
-      if (window.verificarStockCritico) {
-        window.verificarStockCritico(state.inventario);
-      }
-
-      return false;
+      renderDashboard();
     }
     window.addInsumo = addInsumo;
 
-    function deleteInsumo(id) {
-      state.inventario = state.inventario.filter(i => i.id !== id);
-      saveState();
-      showToast('Insumo eliminado');
-      renderInventario();
+    async function deleteInsumo(id) {
+      const { error } = await db.from('inventario').delete().eq('id', id);
+      if (!error) { state.inventario = state.inventario.filter(i => i.id !== id); showToast('Insumo eliminado'); renderInventario(); }
+      else showToast('Error eliminando insumo');
     }
     window.deleteInsumo = deleteInsumo;
 
-    function addMerma(e) {
+    async function addMerma(e) {
       e.preventDefault();
-      const insumoId = parseInt(document.getElementById('merma-insumo').value, 10);
-      const cantidad = parseInt(document.getElementById('merma-cantidad').value, 10);
-      if (isNaN(insumoId) || isNaN(cantidad) || cantidad < 1) return false;
-      const insumo = state.inventario.find(i => i.id === insumoId);
-      if (!insumo) return false;
-      insumo.stock_actual = Math.max(0, insumo.stock_actual - cantidad);
-      state.mermas.push({ id: state.nextMermaId++, insumoId, cantidad, fecha: new Date().toLocaleString() });
-      saveState();
-      showToast('Merma registrada');
-      renderDashboard();
-      return false;
+      const id_insumo = parseInt(document.getElementById('merma-insumo').value, 10);
+      const cantidad_merma = parseFloat(document.getElementById('merma-cantidad').value);
+      if (isNaN(id_insumo) || isNaN(cantidad_merma) || cantidad_merma <= 0) return;
+      const insumo = state.inventario.find(i => i.id === id_insumo);
+      if (!insumo) return;
+      const nuevo_stock = Math.max(0, insumo.stock_actual - cantidad_merma);
+      const mermaData = { id_insumo, cantidad_merma, motivo_merma: 'operativo', timestamp: new Date().toISOString() };
+      const { data, error } = await db.from('mermas').insert(mermaData).select().single();
+      if (!error) {
+        await db.from('inventario').update({ stock_actual: nuevo_stock }).eq('id', id_insumo);
+        insumo.stock_actual = nuevo_stock;
+        if (data) state.mermas.push(data);
+        showToast('Merma registrada');
+        renderDashboard();
+      } else showToast('Error registrando merma');
     }
     window.addMerma = addMerma;
 
-    function addPedido(e) {
+    async function addPedido(e) {
       e.preventDefault();
       const cliente = document.getElementById('pedido-cliente').value.trim();
-      const recetaId = parseInt(document.getElementById('pedido-receta').value, 10);
+      const receta_id = parseInt(document.getElementById('pedido-receta').value, 10);
       const cantidad = parseInt(document.getElementById('pedido-cantidad').value, 10);
-      if (!cliente || isNaN(recetaId) || isNaN(cantidad) || cantidad < 1) return false;
-      state.pedidos.push({ id: state.nextPedidoId++, cliente, recetaId, cantidad, entregado: false });
-      saveState();
-      showToast('Pedido agregado');
-      renderPedidos();
-      return false;
+      if (!cliente || isNaN(receta_id) || isNaN(cantidad) || cantidad < 1) return;
+      const { data, error } = await db.from('pedidos').insert({ cliente, receta_id, cantidad, estado: 'Pendiente', fecha_entrega: new Date().toISOString().split('T')[0] }).select().single();
+      if (!error && data) { state.pedidos.push(data); showToast('Pedido agregado'); renderPedidos(); }
+      else showToast('Error agregando pedido');
     }
     window.addPedido = addPedido;
 
@@ -439,40 +396,41 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
     }
     window.renderRecetas = renderRecetas;
 
-    function addReceta(e) {
+    async function addReceta(e) {
       e.preventDefault();
       const nombre = document.getElementById('receta-nombre').value.trim();
       const descripcion = document.getElementById('receta-descripcion').value.trim();
-      if (!nombre) return false;
-      state.recetas.push({ id: state.nextRecetaId++, nombre, descripcion });
-      saveState();
-      showToast('Receta agregada');
-      renderRecetas();
-      return false;
+      if (!nombre) return;
+      const { data, error } = await db.from('recetas').insert({ nombre, descripcion }).select().single();
+      if (!error && data) { state.recetas.push(data); showToast('Receta agregada'); renderRecetas(); }
+      else showToast('Error agregando receta');
     }
     window.addReceta = addReceta;
 
-    function deleteReceta(id) {
-      const enUso = state.pedidos.some(p => p.recetaId === id);
+    async function deleteReceta(id) {
+      const enUso = state.pedidos.some(p => p.receta_id === id);
       if (enUso) { showToast('No se puede eliminar: receta en uso por pedidos'); return; }
-      state.recetas = state.recetas.filter(r => r.id !== id);
-      saveState();
-      showToast('Receta eliminada');
-      renderRecetas();
+      const { error } = await db.from('recetas').delete().eq('id', id);
+      if (!error) { state.recetas = state.recetas.filter(r => r.id !== id); showToast('Receta eliminada'); renderRecetas(); }
+      else showToast('Error eliminando receta');
     }
     window.deleteReceta = deleteReceta;
 
-    function completePedido(id) {
-      const pedido = state.pedidos.find(p => p.id === id);
-      if (pedido) pedido.entregado = true;
-      saveState();
-      showToast('Pedido entregado');
-      renderPedidos();
+    async function completePedido(id) {
+      const { error } = await db.from('pedidos').update({ estado: 'Entregado' }).eq('id', id);
+      if (!error) {
+        const pedido = state.pedidos.find(p => p.id === id);
+        if (pedido) pedido.estado = 'Entregado';
+        showToast('Pedido marcado como entregado');
+        renderPedidos();
+      } else showToast('Error actualizando pedido');
     }
     window.completePedido = completePedido;
 
     // --- Inicialización ---
-    function init() {
+    async function init() {
+      showToast('Cargando datos...');
+      await loadFromSupabase();
       renderDashboard();
       renderInventario();
       renderMermas();
