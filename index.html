@@ -230,6 +230,15 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
     function renderMermas() {
       const el = document.getElementById('mermas-view');
       el.innerHTML = `
+        <div class="table-card">
+          <h3>Historial de Mermas</h3>
+          <table><thead><tr><th>Insumo</th><th>Cantidad</th><th>Motivo</th><th>Fecha</th></tr></thead><tbody>
+            ${state.mermas.slice().reverse().map(m => {
+              const insumo = state.inventario.find(i => i.id === m.id_insumo);
+              return `<tr><td>${insumo ? insumo.nombre : 'Desconocido'}</td><td>${m.cantidad_merma}</td><td>${m.motivo_merma || '—'}</td><td>${m.timestamp ? new Date(m.timestamp).toLocaleString('es-VE') : '—'}</td></tr>`;
+            }).join('')}
+          </tbody></table>
+        </div>
         <div class="form-card">
           <h3>Registrar Merma</h3>
           <form onsubmit="return addMerma(event)">
@@ -250,15 +259,6 @@ Desarrollado por GitHub Copilot (GPT-4.1) | 2026
             </select>
             <button type="submit">Registrar Merma</button>
           </form>
-        </div>
-        <div class="table-card">
-          <h3>Historial de Mermas</h3>
-          <table><thead><tr><th>Insumo</th><th>Cantidad</th><th>Motivo</th><th>Fecha</th></tr></thead><tbody>
-            ${state.mermas.slice().reverse().map(m => {
-              const insumo = state.inventario.find(i => i.id === m.id_insumo);
-              return `<tr><td>${insumo ? insumo.nombre : 'Desconocido'}</td><td>${m.cantidad_merma}</td><td>${m.motivo_merma || '—'}</td><td>${m.timestamp ? new Date(m.timestamp).toLocaleString('es-VE') : '—'}</td></tr>`;
-            }).join('')}
-          </tbody></table>
         </div>
       `;
       document.getElementById('form-merma-view') && null;
